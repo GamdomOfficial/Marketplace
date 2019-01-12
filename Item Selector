@@ -1,0 +1,67 @@
+function deposit(numberOfItemsToClick, timesClicked = 0, startFrom = 0, itemsInOneRow) {
+    var checkedTops = [],
+        lastTop = 0,
+                currentItems = document.querySelectorAll(".invItemContainer.interactive"),
+                itemHeight = 0,
+                newLineFirstItemIndex = 0;
+    currentItems.forEach(function(item) {
+        if(timesClicked < numberOfItemsToClick) {
+        console.log(`Currently checking: ${item.querySelector(".wea_name").innerText + " " + item.querySelector(".wea_sub").innerText}`);
+                if(item != currentItems[currentItems.length - 1]) {
+            if(!checkedTops.length) {
+                console.log(`This is the first check. First top value is: ${item.style.top}. One item height is: ${item.offsetHeight}`);
+                                itemHeight = item.offsetHeight;
+                lastTop = item.style.top;
+                checkedTops.push(lastTop);
+            }
+            if(item.style.top == lastTop) {
+                if(!item.className.includes("selected")) {
+                    console.log(`Clicking on item ${item.querySelector(".wea_name").innerText + " " + item.querySelector(".wea_sub").innerText}`);
+                    item.click();
+                    timesClicked++;
+                } else {
+                                        console.log(`Item ${item.querySelector(".wea_name").innerText + " " + item.querySelector(".wea_sub").innerText} is already selected. Ignoring this item.`);
+                }
+            } else{
+                                if(checkedTops.length == 1) {
+                                        itemsInOneRow = timesClicked;
+                }
+                console.log(`Starting to the new line. New top value is ${item.style.top}.`);
+                checkedTops.push(lastTop);
+                lastTop = item.style.top;
+                                if(!item.className.includes("selected")) {
+                    console.log(`Clicking on item ${item.querySelector(".wea_name").innerText + " " + item.querySelector(".wea_sub").innerText}`);
+                    item.click();
+                    timesClicked++;
+                } else {
+                                        console.log(`Item ${item.querySelector(".wea_name").innerText + " " + item.querySelector(".wea_sub").innerText} is already selected. Ignoring this item.`);
+                }
+            }
+        } else {
+                        console.log(`This is the last item of this page. Clicking on item ${item.querySelector(".wea_name").innerText + " " + item.querySelector(".wea_sub").innerText} and scrolling if possible.`);
+                        item.click();
+                        timesClicked++;
+                        document.querySelector(".ReactVirtualized__Grid").scrollBy(0, itemHeight * checkedTops.length);
+                        setTimeout(function() {
+                                var newItems = document.querySelectorAll(".invItemContainer.interactive");
+                                newItems = Array.from(newItems);
+                                if(newItems[0] != currentItems[0]) {
+                                        newItems.forEach(function(newItem) {
+ 
+                                                if(newItem.style.top != lastTop) {
+                                                        newLineFirstItemIndex = newItems.indexOf(newItem);
+                                                        console.log(newLineFirstItemIndex);
+                        }
+                    });
+                                        if(newLineFirstItemIndex > 0) {
+                                                deposit(numberOfItemsToClick, timesClicked, Math.ceil(newItems.length / itemsInOneRow), itemsInOneRow);
+                    }
+                }
+            }, 1000);
+        }
+    }
+        else {
+                console.log(`Already clicked to number of items asked for. Ignoring item ${item.querySelector(".wea_name").innerText + " " + item.querySelector(".wea_sub").innerText}`);
+        }
+    });
+}
